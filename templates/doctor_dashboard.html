@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>👨‍⚕️ Doctor Dashboard</h2>
+
+<div style="background:white;padding:20px;border-radius:15px;">
+    <p><b>Name:</b> {{ session.name }}</p>
+    <p><b>Doctor ID:</b> D{{ session.user_id }}</p>
+</div>
+
+<h3 style="margin-top:30px;">👥 Patients</h3>
+
+{% for p in patients %}
+<div style="background:white;padding:15px;border-radius:12px;margin-bottom:10px;">
+    <b>{{ p[1] }}</b><br><br>
+
+    <a href="/chat/{{ p[0] }}">💬 Chat</a> |
+    <a href="/documents/{{ p[0] }}">📁 Documents</a>
+</div>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    max-width: 700px;
+}
+.result {
+    background: #eef2f7;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+}
+</style>
+
+{% if session.role == "patient" %}
+<h2>🧠 ಎಐ ವರದಿ ವಿಶ್ಲೇಷಣೆ</h2>
+{% else %}
+<h2>🧠 AI Report Analyzer</h2>
+{% endif %}
+
+<div class="card">
+
+{% if session.role == "patient" %}
+<p>
+ವೈದ್ಯಕೀಯ ವರದಿ, ಎಕ್ಸ್-ರೇ ಅಥವಾ ಪ್ರಿಸ್ಕ್ರಿಪ್ಶನ್ ಚಿತ್ರದನ್ನೂ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.  
+<br><b>ಸೂಚನೆ:</b> ಇದು ವೈದ್ಯಕೀಯ ನಿರ್ಣಯವಲ್ಲ.
+</p>
+{% else %}
+<p>
+Upload a medical image (X-ray, report, prescription).  
+<br><b>Note:</b> This is not a diagnosis.
+</p>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*" required>
+    <br><br>
+    <button type="submit">
+        {% if session.role == "patient" %}
+            ವರದಿ ವಿಶ್ಲೇಷಿಸಿ
+        {% else %}
+            Analyze Report
+        {% endif %}
+    </button>
+</form>
+
+{% if result %}
+<div class="result">
+    <b>
+    {% if session.role == "patient" %}
+        ಎಐ ವಿವರಣೆ:
+    {% else %}
+        AI Explanation:
+    {% endif %}
+    </b><br><br>
+    {{ result }}
+</div>
+{% endif %}
+
+</div>
+
+{% endblock %}

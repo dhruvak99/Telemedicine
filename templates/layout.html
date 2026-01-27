@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ title }}</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+}
+
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    position: fixed;
+    background: #0b5ed7;
+    color: white;
+    padding-top: 20px;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    margin: 5px 10px;
+    border-radius: 8px;
+}
+
+.sidebar a:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.content {
+    margin-left: 240px;
+    padding: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>🩺 TeleMed</h2>
+
+    
+
+    {% if session.role == "patient" %}
+    <a href="/dashboard">🏠 ಡ್ಯಾಶ್‌ಬೋರ್ಡ್</a>
+    <a href="/my-documents">📁 ನನ್ನ ದಾಖಲೆಗಳು</a>
+    <a href="/kannada-ai">🤖 ಆರೋಗ್ಯ ಸಹಾಯಕ</a>
+    <a href="/ai-report">🧠 ವರದಿ ವಿಶ್ಲೇಷಣೆ</a>
+    <a href="/logout">🚪 ಲಾಗ್ ಔಟ್</a>
+    {% endif %}
+
+
+    {% if session.role == "doctor" %}
+     <a href="/dashboard">🏠 Dashboard</a>   
+    <a href="/dashboard">👥 Patients</a>
+    <a href="/logout">🚪 Logout</a>
+    {% endif %}
+
+    
+
+    
+</div>
+
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

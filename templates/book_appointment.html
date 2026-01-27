@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Book Appointment</title>
+<style>
+body {
+    font-family: Arial;
+    background: #f4f7fb;
+}
+.form-box {
+    width: 400px;
+    margin: 60px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+input, select, textarea, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+}
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="form-box">
+    <h2>📅 Book Appointment</h2>
+    <form method="post">
+        <label>Doctor</label>
+        <select name="doctor">
+            {% for d in doctors %}
+                <option value="{{ d[0] }}">{{ d[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Date</label>
+        <input type="date" name="date" required>
+
+        <label>Reason</label>
+        <textarea name="reason"></textarea>
+
+        <button>Confirm</button>
+    </form>
+</div>
+
+<a href="/dashboard" style="display:block;text-align:center;">⬅ Back</a>
+
+</body>
+</html>

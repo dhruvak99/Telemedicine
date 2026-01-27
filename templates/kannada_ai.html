@@ -1,0 +1,162 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f7f8;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background: #0b5ed7;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+    width: 100%;
+}
+
+.message {
+    max-width: 75%;
+    padding: 14px 18px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.user {
+    background: #0b5ed7;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+}
+
+.ai {
+    background: #e9ecef;
+    color: #000;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+}
+
+.input-bar {
+    border-top: 1px solid #ddd;
+    background: white;
+    padding: 15px;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 10px;
+    max-width: 900px;
+    margin: auto;
+}
+
+.input-wrapper input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.input-wrapper button {
+    padding: 14px 20px;
+    border-radius: 25px;
+    border: none;
+    background: #0b5ed7;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.mic-btn {
+    background: #198754;
+}
+
+.back {
+    text-align: center;
+    padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    🤖 ಕನ್ನಡ ಆರೋಗ್ಯ ಸಹಾಯಕ
+</div>
+
+<div class="chat-container" id="chatBox">
+    {% for msg in chat %}
+        {% if msg.role == "user" %}
+            <div class="message user">{{ msg.text }}</div>
+        {% else %}
+            <div class="message ai">{{ msg.text }}</div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="input-bar">
+    <form method="post" action="/kannada-ai">
+        <div class="input-wrapper">
+            <input id="msg" name="message"
+                   placeholder="ಕನ್ನಡದಲ್ಲಿ ಪ್ರಶ್ನೆ ಕೇಳಿ..."
+                   required>
+
+            <button type="submit">ಪ್ರಶ್ನೆ ಕೇಳಿ</button>
+
+            <button type="button" class="mic-btn"
+                    onmousedown="startRecording()"
+                    onmouseup="stopRecording()"
+                    ontouchstart="startRecording()"
+                    ontouchend="stopRecording()">
+                🎤
+            </button>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+let recognition;
+
+function startRecording() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Speech recognition not supported");
+        return;
+    }
+
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = "kn-IN";
+    recognition.continuous = false;
+
+    recognition.onresult = function(event) {
+        document.getElementById("msg").value =
+            event.results[0][0].transcript;
+    };
+
+    recognition.start();
+}
+
+function stopRecording() {
+    if (recognition) recognition.stop();
+}
+
+// Auto-scroll to bottom
+const chatBox = document.getElementById("chatBox");
+chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock %}

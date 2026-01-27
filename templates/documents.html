@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+</style>
+
+{% if session.role == "patient" %}
+    <h2>📁 ನನ್ನ ದಾಖಲೆಗಳು</h2>
+{% else %}
+    <h2>📁 Patient Documents</h2>
+{% endif %}
+
+{% for d in docs %}
+<div class="card">
+
+    <b>
+    {% if session.role == "patient" %}
+        ಫೈಲ್ ಹೆಸರು:
+    {% else %}
+        File Name:
+    {% endif %}
+    </b>
+    {{ d[0] }}<br>
+
+    {% if session.role == "patient" %}
+        ಅಪ್‌ಲೋಡ್ ದಿನಾಂಕ:
+    {% else %}
+        Uploaded on:
+    {% endif %}
+    {{ d[2] }}<br><br>
+
+    <a href="/download?path={{ d[1] }}">
+        {% if session.role == "patient" %}
+            ⬇ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ
+        {% else %}
+            ⬇ Download
+        {% endif %}
+    </a>
+
+</div>
+{% else %}
+<p>
+{% if session.role == "patient" %}
+    ಯಾವುದೇ ದಾಖಲೆಗಳು ಲಭ್ಯವಿಲ್ಲ.
+{% else %}
+    No documents uploaded.
+{% endif %}
+</p>
+{% endfor %}
+
+{% endblock %}

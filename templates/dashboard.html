@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+}
+.header {
+    background: linear-gradient(90deg, #007bff, #00c6ff);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+    gap: 20px;
+    padding: 30px;
+}
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.card a {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border-radius: 25px;
+    text-decoration: none;
+}
+.list a {
+    display: block;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 10px;
+    background: #eef3ff;
+    text-decoration: none;
+    color: #333;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h2>🩺 Telemedicine Dashboard</h2>
+    <div>
+        {{ name }} ({{ role }}) |
+        <a href="/logout" style="color:white;">Logout</a>
+    </div>
+</div>
+
+<div class="card-container">
+
+{% if role == "patient" %}
+    <div class="card">
+        <h3>📅 Book Appointment</h3>
+        <a href="/book">Book Now</a>
+    </div>
+
+    <div class="card">
+        <h3>📄 My Appointments</h3>
+        <a href="/appointments">View</a>
+    </div>
+
+    <div class="card list">
+        <h3>💬 Chat with Doctor</h3>
+        {% for d in doctors %}
+            <a href="/chat/{{ d[0] }}">{{ d[1] }}</a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card">
+        <h3>📋 Appointments</h3>
+        <a href="/appointments">Manage</a>
+    </div>
+
+    <div class="card list">
+        <h3>💬 Chat with Patients</h3>
+        {% for p in patients %}
+            <a href="/chat/{{ p[0] }}">{{ p[1] }}</a>
+        {% endfor %}
+    </div>
+{% endif %}
+
+</div>
+
+</body>
+</html>

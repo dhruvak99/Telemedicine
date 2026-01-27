@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+.box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    max-width: 600px;
+}
+</style>
+
+<div class="box">
+    <h2>📁 ದಾಖಲೆಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ</h2>
+
+    <p>ವೈದ್ಯರು ಪರಿಶೀಲಿಸಲು ನಿಮ್ಮ ವೈದ್ಯಕೀಯ ದಾಖಲೆಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <br><br>
+
+        <button type="submit">
+            ⬆ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ
+        </button>
+    </form>
+</div>
+
+{% endblock %}

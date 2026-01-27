@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Appointments</title>
+<style>
+body {
+    font-family: Arial;
+    background: #f4f7fb;
+}
+table {
+    width: 90%;
+    margin: 40px auto;
+    background: white;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+th {
+    background: #007bff;
+    color: white;
+}
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+</style>
+</head>
+
+<body>
+
+<h2 style="text-align:center;">📋 Appointments</h2>
+
+<table>
+<tr>
+    <th>Name</th>
+    <th>Date</th>
+    <th>Reason</th>
+    <th>Status</th>
+    {% if session.role == "doctor" %}<th>Action</th>{% endif %}
+</tr>
+
+{% for a in data %}
+<tr>
+    <td>{{ a[1] }}</td>
+    <td>{{ a[2] }}</td>
+    <td>{{ a[3] }}</td>
+    <td>{{ a[4] }}</td>
+    {% if session.role == "doctor" and a[4] == "Pending" %}
+        <td><a href="/approve/{{ a[0] }}">Approve</a></td>
+    {% endif %}
+</tr>
+{% endfor %}
+</table>
+
+<a href="/dashboard" style="display:block;text-align:center;">⬅ Back</a>
+
+</body>
+</html>

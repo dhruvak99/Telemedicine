@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>👤 ರೋಗಿಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್</h2>
+
+<div style="background:white;padding:20px;border-radius:15px;">
+    <p><b>ಹೆಸರು:</b> {{ session.name }}</p>
+    <p><b>ರೋಗಿ ಐಡಿ:</b> P{{ session.user_id }}</p>
+</div>
+
+<h3 style="margin-top:30px;">👨‍⚕️ ನಿಮ್ಮ ವೈದ್ಯರು</h3>
+
+{% for d in doctors %}
+<div style="background:white;padding:15px;border-radius:12px;margin-bottom:10px;">
+    <b>{{ d[1] }}</b><br><br>
+
+    <a href="/chat/{{ d[0] }}"><button style="
+            padding:10px 20px;
+            border:none;
+            background:#0b5ed7;
+            color:white;
+            border-radius:20px;
+            cursor:pointer;
+        ">💬 ಚಾಟ್ </button></a> 
+    <h3>📁 ದಾಖಲೆಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ</h3>
+    <p>ವೈದ್ಯರು ಪರಿಶೀಲಿಸಲು ವೈದ್ಯಕೀಯ ದಾಖಲೆಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.</p>
+
+    <a href="/upload">
+        <button style="
+            padding:10px 20px;
+            border:none;
+            background:#0b5ed7;
+            color:white;
+            border-radius:20px;
+            cursor:pointer;
+        ">
+            ⬆ ದಾಖಲೆ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ
+        </button>
+    </a>
+    
+</div>
+{% else %}
+<p>ಯಾವುದೇ ವೈದ್ಯರು ಲಭ್ಯವಿಲ್ಲ.</p>
+{% endfor %}
+
+
+
+{% endblock %}
