@@ -2,10 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import requests
 
-
-
-import requests
-OLLAMA_URL = "http://100.75.119.97:30068/api/generate"
+OLLAMA_URL = os.environ.get(
+"OLLAMA_URL",
+"http://localhost:11434/api/generate"
+    )
+#OLLAMA_URL = "http://100.75.119.97:30068/api/generate"
 OLLAMA_MODEL = "translategemma:12b"
 
 def translate_kn_to_en(text):
@@ -241,7 +242,7 @@ def kannada_ai():
                 }
 
                 r = requests.post(
-                    "http://100.75.119.97:30068/api/generate",
+                    OLLAMA_URL,
                     json=payload,
                     timeout=60
                 )
@@ -391,7 +392,7 @@ def ai_report():
 
             try:
                 r = requests.post(
-                    "http://100.75.119.97:30068/api/generate",
+                    OLLAMA_URL,
                     json=payload,
                     timeout=180
                 )
@@ -408,7 +409,7 @@ def ai_report():
                         }
 
                         tr = requests.post(
-                            "http://100.75.119.97:30068/api/generate",
+                            OLLAMA_URL,
                             json=translate_payload,
                             timeout=120
                         )
