@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import requests
 import os as os
+import os
+from werkzeug.utils import secure_filename
 
 OLLAMA_URL = os.environ.get(
 "OLLAMA_URL",
@@ -48,10 +50,11 @@ def translate_en_to_kn(text):
 app = Flask(__name__)
 app.secret_key = "secret123"
 
-import os
-from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = "uploads"
+BASE_DIR = "/app"
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+DB_PATH = os.path.join(BASE_DIR, "db.sqlite3")
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/upload", methods=["GET", "POST"])
@@ -71,9 +74,10 @@ def upload_document():
             os.makedirs(patient_folder, exist_ok=True)
 
             filepath = os.path.join(patient_folder, filename)
+            print("SAVING TO:", filepath)
             file.save(filepath)
 
-            conn = sqlite3.connect("db.sqlite3")
+            conn = sqlite3.connect(DB_PATH)
             cur = conn.cursor()
             cur.execute("""
                 INSERT INTO documents (patient_id, filename, filepath)
@@ -91,7 +95,7 @@ def view_documents(patient_id):
     if "user_id" not in session or session["role"] != "doctor":
         return redirect("/login")
 
-    conn = sqlite3.connect("db.sqlite3")
+    conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("""
         SELECT filename, filepath, uploaded_at
@@ -110,6 +114,8 @@ from flask import send_file
 @app.route("/download")
 def download_file():
     path = request.args.get("path")
+    if not path.startswith(UPLOAD_FOLDER):
+        return "Invalid path", 403
     return send_file(path, as_attachment=True)
 
 
@@ -119,7 +125,7 @@ def my_documents():
     if "user_id" not in session or session["role"] != "patient":
         return redirect("/login")
 
-    conn = sqlite3.connect("db.sqlite3")
+    conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("""
         SELECT filename, filepath, uploaded_at
@@ -138,7 +144,7 @@ def my_documents():
 # 🗄️ DATABASE
 # =====================================================
 def get_db():
-    return sqlite3.connect("db.sqlite3")
+    return sqlite3.connect(DB_PATH)
 
 def init_db():
     db = get_db()
@@ -323,7 +329,7 @@ def dashboard():
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("db.sqlite3")
+    conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
     # ---------------- PATIENT DASHBOARD ----------------
@@ -370,7 +376,7 @@ def ai_report():
         file = request.files.get("image")
 
         if file and file.filename:
-            filepath = os.path.join("uploads", file.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(filepath)
 
             import base64, requests
