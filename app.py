@@ -524,30 +524,27 @@ def chat(other_id):
                 VALUES (?, ?, ?, ?)
             """, (session["user_id"], other_id, message_en, message_kn))
             db.commit()
-            db.close()
 
-            # ✅ POST → REDIRECT → GET (prevents duplicate sends)
-            return redirect(url_for("chat", other_id=other_id))
+        # 🔥 IMPORTANT: Redirect after POST (prevents duplicate sends)
+        return redirect(url_for("chat", other_id=other_id))
 
-    # ---------------- FETCH CHAT ----------------
-    if session["role"] == "patient":
-        cur.execute("""
-            SELECT sender_id, message_kn
-            FROM messages
-            WHERE (sender_id=? AND receiver_id=?)
-               OR (sender_id=? AND receiver_id=?)
-            ORDER BY timestamp
-        """, (session["user_id"], other_id, other_id, session["user_id"]))
-    else:
-        cur.execute("""
-            SELECT sender_id, message_en
-            FROM messages
-            WHERE (sender_id=? AND receiver_id=?)
-               OR (sender_id=? AND receiver_id=?)
-            ORDER BY timestamp
-        """, (session["user_id"], other_id, other_id, session["user_id"]))
+    # ---------------- FETCH MESSAGES ----------------
+    cur.execute("""
+        SELECT sender_id, message_en, message_kn
+        FROM messages
+        WHERE (sender_id=? AND receiver_id=?)
+           OR (sender_id=? AND receiver_id=?)
+        ORDER BY timestamp
+    """, (session["user_id"], other_id, other_id, session["user_id"]))
 
-    chats = cur.fetchall()
+    rows = cur.fetchall()
+
+    chats = []
+    for sender_id, msg_en, msg_kn in rows:
+        if session["role"] == "patient":
+            chats.append((sender_id, msg_kn))
+        else:
+            chats.append((sender_id, msg_en))
 
     cur.execute("SELECT name FROM users WHERE id=?", (other_id,))
     other_name = cur.fetchone()[0]
