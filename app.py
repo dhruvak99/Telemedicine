@@ -507,31 +507,32 @@ def chat(other_id):
     db = get_db()
     cur = db.cursor()
 
+    # ---------------- SEND MESSAGE ----------------
     if request.method == "POST":
-        raw = request.form["message"]
+        raw = request.form["message"].strip()
 
-        
+        if raw:
+            if session["role"] == "patient":
+                message_kn = raw
+                message_en = translate_kn_to_en(raw)
+            else:
+                message_en = raw
+                message_kn = translate_en_to_kn(raw)
 
-        if session["role"] == "patient":
-            # Patient input = Kannada
-            message_kn = raw
-            message_en = translate_kn_to_en(raw)
-        else:
-            # Doctor input = English
-            message_en = raw
-            message_kn = translate_en_to_kn(raw)
+            cur.execute("""
+                INSERT INTO messages (sender_id, receiver_id, message_en, message_kn)
+                VALUES (?, ?, ?, ?)
+            """, (session["user_id"], other_id, message_en, message_kn))
+            db.commit()
+            db.close()
 
+            # ✅ POST → REDIRECT → GET (prevents duplicate sends)
+            return redirect(url_for("chat", other_id=other_id))
 
-        cur.execute("""
-            INSERT INTO messages (sender_id,receiver_id,message_en,message_kn)
-            VALUES (?,?,?,?)
-        """, (session["user_id"], other_id, message_en, message_kn))
-        db.commit()
-
-    # STRICT language enforcement
+    # ---------------- FETCH CHAT ----------------
     if session["role"] == "patient":
         cur.execute("""
-            SELECT sender_id,message_kn
+            SELECT sender_id, message_kn
             FROM messages
             WHERE (sender_id=? AND receiver_id=?)
                OR (sender_id=? AND receiver_id=?)
@@ -539,7 +540,7 @@ def chat(other_id):
         """, (session["user_id"], other_id, other_id, session["user_id"]))
     else:
         cur.execute("""
-            SELECT sender_id,message_en
+            SELECT sender_id, message_en
             FROM messages
             WHERE (sender_id=? AND receiver_id=?)
                OR (sender_id=? AND receiver_id=?)
@@ -547,8 +548,10 @@ def chat(other_id):
         """, (session["user_id"], other_id, other_id, session["user_id"]))
 
     chats = cur.fetchall()
+
     cur.execute("SELECT name FROM users WHERE id=?", (other_id,))
     other_name = cur.fetchone()[0]
+
     db.close()
 
     return render_template(
