@@ -557,6 +557,40 @@ def chat(other_id):
         other_name=other_name
     )
 
+@app.route("/chat/<int:other_id>/messages")
+def chat_messages(other_id):
+    if "user_id" not in session:
+        return {}
+
+    db = get_db()
+    cur = db.cursor()
+
+    if session["role"] == "patient":
+        cur.execute("""
+            SELECT sender_id, message_kn
+            FROM messages
+            WHERE (sender_id=? AND receiver_id=?)
+               OR (sender_id=? AND receiver_id=?)
+            ORDER BY timestamp
+        """, (session["user_id"], other_id, other_id, session["user_id"]))
+    else:
+        cur.execute("""
+            SELECT sender_id, message_en
+            FROM messages
+            WHERE (sender_id=? AND receiver_id=?)
+               OR (sender_id=? AND receiver_id=?)
+            ORDER BY timestamp
+        """, (session["user_id"], other_id, other_id, session["user_id"]))
+
+    data = cur.fetchall()
+    db.close()
+
+    return {
+        "messages": [
+            {"sender": s, "text": t} for s, t in data
+        ]
+    }
+
 
 
 if __name__ == "__main__":

@@ -139,16 +139,24 @@ document.getElementById("chatForm").addEventListener("submit", () => {
 
 /* 🟢 AUTO REFRESH CHAT (POLLING) */
 setInterval(() => {
-    fetch(window.location.href)
-        .then(res => res.text())
-        .then(html => {
-            const temp = document.createElement("div");
-            temp.innerHTML = html;
-            const newChat = temp.querySelector("#chatBox");
-            if (newChat) {
-                chatBox.innerHTML = newChat.innerHTML;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
+    fetch(window.location.pathname + "/messages")
+        .then(res => res.json())
+        .then(data => {
+            if (!data.messages) return;
+
+            chatBox.innerHTML = "";
+            data.messages.forEach(msg => {
+                const div = document.createElement("div");
+                div.className =
+                    msg.sender === {{ session.user_id }}
+                    ? "msg-you"
+                    : "msg-other";
+
+                div.innerHTML = `<span>${msg.text}</span>`;
+                chatBox.appendChild(div);
+            });
+
+            chatBox.scrollTop = chatBox.scrollHeight;
         });
 }, 3000);
 
