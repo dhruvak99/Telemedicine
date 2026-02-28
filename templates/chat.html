@@ -24,7 +24,6 @@
     text-align: right;
     margin-bottom: 15px;
 }
-
 .msg-you span {
     display: inline-block;
     background: #0b5ed7;
@@ -38,7 +37,6 @@
     text-align: left;
     margin-bottom: 15px;
 }
-
 .msg-other span {
     display: inline-block;
     background: white;
@@ -49,7 +47,6 @@
 
 .input-area {
     display: flex;
-    align-items: center;
     gap: 10px;
     margin-top: 15px;
 }
@@ -59,32 +56,15 @@
     padding: 14px;
     border-radius: 25px;
     border: 1px solid #ccc;
-    font-size: 15px;
 }
 
 .input-area button {
     padding: 14px 22px;
-    border: none;
     border-radius: 25px;
+    border: none;
     background: #0b5ed7;
     color: white;
-    font-size: 15px;
     cursor: pointer;
-}
-
-.video-bar {
-    text-align: center;
-    margin: 15px 0;
-}
-
-.video-bar a {
-    display: inline-block;
-    padding: 12px 25px;
-    background: #198754;
-    color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: bold;
 }
 
 .mic-btn-inline {
@@ -96,15 +76,8 @@
     💬 Chat with {{ other_name }}
 </div>
 
-<div class="chat-box" id="chatBox">
-    {% for msg in chats %}
-        {% if msg[0] == session.user_id %}
-            <div class="msg-you"><span>{{ msg[1] }}</span></div>
-        {% else %}
-            <div class="msg-other"><span>{{ msg[1] }}</span></div>
-        {% endif %}
-    {% endfor %}
-</div>
+<!-- ❗ EMPTY BOX — JS CONTROLS EVERYTHING -->
+<div class="chat-box" id="chatBox"></div>
 
 <div class="video-bar">
     <a href="https://meet.google.com/kzw-rqov-ric" target="_blank">
@@ -113,7 +86,7 @@
 </div>
 
 <form method="post" class="input-area" id="chatForm">
-    <input id="msg" name="message" placeholder="Speak or type..." required>
+    <input id="msg" name="message" placeholder="Type here..." required>
 
     {% if session.role == "patient" %}
     <button type="button"
@@ -128,45 +101,42 @@
 </form>
 
 <script>
-/* 🟢 AUTO-SCROLL */
 const chatBox = document.getElementById("chatBox");
-chatBox.scrollTop = chatBox.scrollHeight;
+const myUserId = {{ session.user_id }};
 
-/* 🟢 PREVENT DUPLICATE SEND */
-document.getElementById("chatForm").addEventListener("submit", () => {
-    document.getElementById("sendBtn").disabled = true;
-});
-
-/* 🟢 AUTO REFRESH CHAT (POLLING) */
-setInterval(() => {
+/* 🔄 LOAD MESSAGES */
+function loadMessages() {
     fetch(window.location.pathname + "/messages")
         .then(res => res.json())
         .then(data => {
             if (!data.messages) return;
 
             chatBox.innerHTML = "";
+
             data.messages.forEach(msg => {
                 const div = document.createElement("div");
-                div.className =
-                    msg.sender === {{ session.user_id }}
-                    ? "msg-you"
-                    : "msg-other";
-
+                div.className = msg.sender === myUserId ? "msg-you" : "msg-other";
                 div.innerHTML = `<span>${msg.text}</span>`;
                 chatBox.appendChild(div);
             });
 
             chatBox.scrollTop = chatBox.scrollHeight;
         });
-}, 3000);
+}
 
-/* 🎤 SPEECH INPUT */
+/* ⏱ Poll every 3 seconds */
+loadMessages();
+setInterval(loadMessages, 3000);
+
+/* 🚫 Prevent double send */
+document.getElementById("chatForm").addEventListener("submit", () => {
+    document.getElementById("sendBtn").disabled = true;
+});
+
+/* 🎤 Speech input */
 let recognition;
 function startRecording() {
-    if (!('webkitSpeechRecognition' in window)) {
-        alert("Speech recognition not supported");
-        return;
-    }
+    if (!('webkitSpeechRecognition' in window)) return;
     recognition = new webkitSpeechRecognition();
     recognition.lang = "kn-IN";
     recognition.onresult = e => {
